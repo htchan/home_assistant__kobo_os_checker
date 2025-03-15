@@ -1,0 +1,9 @@
+{
+  "domain": "home_assistant__kobo_os_checker",
+  "name": "Kobo OS Checker",
+  "version": "1.0.0",
+  "config_flow": true,
+  "dependencies": [],
+  "codeowners": ["@htchan"],
+  "requirements": []
+}
