@@ -1,20 +1,25 @@
 """The Kobo OS Checker integration."""
 
+from datetime import timedelta
+
 from .coordinator import KoboOsDataUpdateCoordinator
 from .const import (
     CONF_KOBO_DEVICE,
+    CONF_UPDATE_INTERVAL,
+    DEFAULT_UPDATE_INTERVAL,
     PLATFORMS,
-    UPDATE_COORDINATOR_UPDATE_INTERVAL,
 )
 
 
 async def async_setup_entry(hass, entry):
     """Set up the sensor from a config entry."""
+    update_minutes = entry.data.get(CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL)
+
     coordinator = KoboOsDataUpdateCoordinator(
         hass,
         entry,
         device_name=entry.data[CONF_KOBO_DEVICE],
-        update_interval=UPDATE_COORDINATOR_UPDATE_INTERVAL,
+        update_interval=timedelta(minutes=update_minutes),
     )
     await coordinator.async_config_entry_first_refresh()
 
