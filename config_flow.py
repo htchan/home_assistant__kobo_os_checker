@@ -29,6 +29,10 @@ class KoboOsConfigFlow(ConfigFlow, domain=DOMAIN):
     ) -> ConfigFlowResult:
         """Handle the initial user step."""
         if user_input is not None:
+            # Check for duplicate device
+            self._async_abort_entries_match(
+                {CONF_KOBO_DEVICE: user_input[CONF_KOBO_DEVICE]}
+            )
             self._entry_data.update(user_input)
             return self.async_create_entry(
                 title=self._entry_data[CONF_KOBO_DEVICE],
