@@ -1,4 +1,5 @@
-import logging
+"""Sensor platform for Kobo OS Checker integration."""
+
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_NAME
 from homeassistant.components.sensor import (
@@ -8,18 +9,13 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 
-from .const import (
-    KOBO_DEVICE_ID_MAPPING,
-    DOMAIN
-)
-
-from .const import (DOMAIN, CONF_NAME, CONF_KOBO_DEVICE)
+from .const import DOMAIN, CONF_KOBO_DEVICE
 from .coordinator import KoboOsDataUpdateCoordinator
 from .entity import KoboOsEntity
 
 import re
+
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -27,7 +23,7 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up sensors."""
-    entity_name = entry.data[CONF_NAME]
+    entity_name = entry.data.get(CONF_NAME) or entry.title
     coordinator: KoboOsDataUpdateCoordinator = entry.runtime_data
     async_add_entities(
         [
@@ -62,8 +58,10 @@ async def async_setup_entry(
         ]
     )
 
+
 class KoboOsVersionSensor(KoboOsEntity, SensorEntity):
     """Sensor for Kobo OS version."""
+
     _attr_name = "Kobo OS Version"
 
     def __init__(self, entry: ConfigEntry, coordinator: KoboOsDataUpdateCoordinator, entity_description: SensorEntityDescription) -> None:
@@ -77,8 +75,10 @@ class KoboOsVersionSensor(KoboOsEntity, SensorEntity):
         """Return the state of the sensor."""
         return self.coordinator.data.get("version") if self.coordinator.data else None
 
+
 class KoboOsReleaseDateSensor(KoboOsEntity, SensorEntity):
     """Sensor for Kobo OS date."""
+
     _attr_name = "Kobo OS Date"
 
     def __init__(self, entry: ConfigEntry, coordinator: KoboOsDataUpdateCoordinator, entity_description: SensorEntityDescription) -> None:
@@ -92,8 +92,10 @@ class KoboOsReleaseDateSensor(KoboOsEntity, SensorEntity):
         """Return the state of the sensor."""
         return self.coordinator.data.get("date") if self.coordinator.data else None
 
+
 class KoboOsReleaseNoteUrlSensor(KoboOsEntity, SensorEntity):
     """Sensor for Kobo OS release note URL."""
+
     _attr_name = "Kobo OS Release Note URL"
 
     def __init__(self, entry: ConfigEntry, coordinator: KoboOsDataUpdateCoordinator, entity_description: SensorEntityDescription) -> None:
