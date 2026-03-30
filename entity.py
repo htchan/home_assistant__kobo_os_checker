@@ -21,7 +21,7 @@ class KoboOsEntity(CoordinatorEntity[KoboOsDataUpdateCoordinator]):
         self._attr_device_info = DeviceInfo(
             name=f"{coordinator.device_name}",
             identifiers={(DOMAIN, coordinator.device_id)},
-            manufacturer="Rakuten Kobo",
+            manufacturer="htchan",
             entry_type=DeviceEntryType.SERVICE,
         )
         self.entity_description = entity_description
