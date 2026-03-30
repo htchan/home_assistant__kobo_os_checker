@@ -4,46 +4,13 @@
         "abort": {
             "already_configured": "[%key:common::config_flow::abort::already_configured_device%]"
         },
-        "setp": {
+        "step": {
             "user": {
                 "title": "Select Kobo Device",
                 "description": "Select the Kobo device you want to track version for.",
                 "data": {
-                    "device_source": "Device"
+                    "kobo_device": "Device"
                 }
-            },
-            "kobo_device": {
-                "title": "Configure",
-                "description": "Configure {kobo_device} version tracking",
-                "data": {
-                    "Kobo Touch A/B": "00000000-0000-0000-0000-000000000310",
-                    "Kobo Touch C": "00000000-0000-0000-0000-000000000320",
-                    "Kobo Mini": "00000000-0000-0000-0000-000000000340",
-                    "Kobo Glo": "00000000-0000-0000-0000-000000000330",
-                    "Kobo Glo HD": "00000000-0000-0000-0000-000000000371",
-                    "Kobo Touch 2.0": "00000000-0000-0000-0000-000000000372",
-                    "Kobo Aura": "00000000-0000-0000-0000-000000000360",
-                    "Kobo Aura HD": "00000000-0000-0000-0000-000000000350",
-                    "Kobo Aura H2O": "00000000-0000-0000-0000-000000000370",
-                    "Kobo Aura H2O Edition 2 v1": "00000000-0000-0000-0000-000000000374",
-                    "Kobo Aura H2O Edition 2 v2": "00000000-0000-0000-0000-000000000378",
-                    "Kobo Aura ONE": "00000000-0000-0000-0000-000000000373",
-                    "Kobo Aura ONE Limited Edition": "00000000-0000-0000-0000-000000000381",
-                    "Kobo Aura Edition 2 v1": "00000000-0000-0000-0000-000000000375",
-                    "Kobo Aura Edition 2 v2": "00000000-0000-0000-0000-000000000379",
-                    "Kobo Nia": "00000000-0000-0000-0000-000000000382",
-                    "Kobo Clara HD": "00000000-0000-0000-0000-000000000376",
-                    "Kobo Forma": "00000000-0000-0000-0000-000000000380",
-                    "Kobo Libra H2O": "00000000-0000-0000-0000-000000000384",
-                    "Kobo Elipsa": "00000000-0000-0000-0000-000000000387",
-                    "Kobo Sage": "00000000-0000-0000-0000-000000000383",
-                    "Kobo Libra 2": "00000000-0000-0000-0000-000000000388",
-                    "Kobo Clara 2E": "00000000-0000-0000-0000-000000000386",
-                    "Kobo Elipsa 2E": "00000000-0000-0000-0000-000000000389",
-                    "Kobo Libra Colour": "00000000-0000-0000-0000-000000000390",
-                    "Kobo Clara BW": "00000000-0000-0000-0000-000000000391",
-                    "Kobo Clara Colour": "00000000-0000-0000-0000-000000000393"
-                }                  
             }
         }
     }
