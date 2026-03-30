@@ -14,8 +14,6 @@ from .const import DOMAIN, CONF_KOBO_DEVICE
 from .coordinator import KoboOsDataUpdateCoordinator
 from .entity import KoboOsEntity
 
-import re
-
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -68,7 +66,6 @@ class KoboOsVersionSensor(KoboOsEntity, SensorEntity):
         """Initialize the sensor."""
         super().__init__(coordinator=coordinator, entity_description=entity_description)
         self._attr_unique_id = f"{DOMAIN}__{coordinator.device_name}__os_version"
-        self.entity_id = f"sensor.{re.sub('[ /.]', '_', coordinator.device_name.lower())}__os_version"
 
     @property
     def native_value(self) -> str:
@@ -85,7 +82,6 @@ class KoboOsReleaseDateSensor(KoboOsEntity, SensorEntity):
         """Initialize the sensor."""
         super().__init__(coordinator=coordinator, entity_description=entity_description)
         self._attr_unique_id = f"{DOMAIN}__{coordinator.device_name}__os_release_date"
-        self.entity_id = f"sensor.{re.sub('[ /.]', '_', coordinator.device_name.lower())}__os_release_date"
 
     @property
     def native_value(self) -> str:
@@ -102,7 +98,6 @@ class KoboOsReleaseNoteUrlSensor(KoboOsEntity, SensorEntity):
         """Initialize the sensor."""
         super().__init__(coordinator=coordinator, entity_description=entity_description)
         self._attr_unique_id = f"{DOMAIN}__{coordinator.device_name}__os_release_note_url"
-        self.entity_id = f"sensor.{re.sub('[ /.]', '_', coordinator.device_name.lower())}__os_release_note_url"
 
     @property
     def native_value(self) -> str:
