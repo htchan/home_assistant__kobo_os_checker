@@ -5,5 +5,8 @@
   "config_flow": true,
   "dependencies": [],
   "codeowners": ["@htchan"],
-  "requirements": []
+  "requirements": [],
+  "documentation": "https://github.com/htchan/home_assistant__kobo_os_checker",
+  "issue_tracker": "https://github.com/htchan/home_assistant__kobo_os_checker/issues",
+  "iot_class": "cloud_polling"
 }
