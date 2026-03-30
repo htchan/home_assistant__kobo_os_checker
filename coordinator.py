@@ -2,24 +2,24 @@
 
 from __future__ import annotations
 
-from typing import Any
+from datetime import timedelta
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .const import (
     LOGGER,
-    DOMAIN, 
+    DOMAIN,
     UPDATE_COORDINATOR_UPDATE_INTERVAL,
     KOBO_DEVICE_ID_MAPPING,
 )
 
-import requests
 import re
 from datetime import datetime
 from zoneinfo import ZoneInfo
-import asyncio
+
 
 class KoboOsDataUpdateCoordinator(DataUpdateCoordinator[dict]):
     """Data update coordinator for Kobo OS entities."""
@@ -41,25 +41,34 @@ class KoboOsDataUpdateCoordinator(DataUpdateCoordinator[dict]):
         self.device_name = device_name
         self.device_id = KOBO_DEVICE_ID_MAPPING[device_name]
         self.config_entry = config_entry
-    
-    def fetch_data(self) -> dict:
-        """Fetch data from Kobo API."""
-        try:
-            resp = requests.get(f'http://api.kobobooks.com/1.0/UpgradeCheck/Device/{self.device_id}/kobo/0.0/N0')
-            resp.raise_for_status()
-            data = resp.json()
-            result = re.search(r'https://ereaderfiles.kobo.com/firmwares/(.*?)/(.*?)/kobo-update-(.*?).zip', data['UpgradeURL'])
-            return {
-                'version': f"{result.group(1)} - {result.group(3)}",
-                'date': datetime.strptime(result.group(2), "%b%Y").replace(tzinfo=ZoneInfo('UTC')),
-                "release_note_url": data['ReleaseNoteURL']
-            }
-        except Exception as err:
-            raise UpdateFailed(f"Error communicating with API: {err}")
 
     async def _async_update_data(self) -> dict:
         """Fetch data from Kobo API."""
-        loop = asyncio.get_running_loop()
-        result = await loop.run_in_executor(None, self.fetch_data)
-        
-        return result
+        session = async_get_clientsession(self.hass)
+        url = f"http://api.kobobooks.com/1.0/UpgradeCheck/Device/{self.device_id}/kobo/0.0/N0"
+
+        try:
+            async with session.get(url) as resp:
+                resp.raise_for_status()
+                data = await resp.json()
+        except Exception as err:
+            raise UpdateFailed(f"Error communicating with API: {err}") from err
+
+        upgrade_url = data.get("UpgradeURL")
+        if not upgrade_url:
+            raise UpdateFailed("UpgradeURL not found in API response")
+
+        result = re.search(
+            r"https://ereaderfiles\.kobo\.com/firmwares/(.*?)/(.*?)/kobo-update-(.*?)\.zip",
+            upgrade_url,
+        )
+        if not result:
+            raise UpdateFailed(f"Could not parse firmware URL: {upgrade_url}")
+
+        return {
+            "version": f"{result.group(1)} - {result.group(3)}",
+            "date": datetime.strptime(result.group(2), "%b%Y").replace(
+                tzinfo=ZoneInfo("UTC")
+            ),
+            "release_note_url": data.get("ReleaseNoteURL", ""),
+        }
