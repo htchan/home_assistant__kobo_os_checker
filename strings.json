@@ -9,7 +9,8 @@
                 "title": "Select Kobo Device",
                 "description": "Select the Kobo device you want to track version for.",
                 "data": {
-                    "kobo_device": "Device"
+                    "kobo_device": "Device",
+                    "update_interval": "Update interval (minutes)"
                 }
             }
         }
