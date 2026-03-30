@@ -1,4 +1,4 @@
-"""Data update coordinator for Version entities."""
+"""Data update coordinator for Kobo OS Checker entities."""
 
 from __future__ import annotations
 
@@ -16,9 +16,14 @@ from .const import (
     KOBO_DEVICE_ID_MAPPING,
 )
 
+import aiohttp
 import re
 from datetime import datetime
 from zoneinfo import ZoneInfo
+
+API_BASE_URL = "https://api.kobobooks.com/1.0/UpgradeCheck/Device"
+REQUEST_TIMEOUT = aiohttp.ClientTimeout(total=30)
+MAX_RESPONSE_SIZE = 1024 * 1024  # 1 MB
 
 
 class KoboOsDataUpdateCoordinator(DataUpdateCoordinator[dict]):
@@ -45,18 +50,41 @@ class KoboOsDataUpdateCoordinator(DataUpdateCoordinator[dict]):
     async def _async_update_data(self) -> dict:
         """Fetch data from Kobo API."""
         session = async_get_clientsession(self.hass)
-        url = f"http://api.kobobooks.com/1.0/UpgradeCheck/Device/{self.device_id}/kobo/0.0/N0"
+        url = f"{API_BASE_URL}/{self.device_id}/kobo/0.0/N0"
 
         try:
-            async with session.get(url) as resp:
+            async with session.get(url, timeout=REQUEST_TIMEOUT) as resp:
                 resp.raise_for_status()
+
+                # Validate content type
+                content_type = resp.headers.get("Content-Type", "")
+                if "json" not in content_type and "text" not in content_type:
+                    raise UpdateFailed(
+                        f"Unexpected content type from API: {content_type}"
+                    )
+
+                # Guard against oversized responses
+                content_length = resp.content_length
+                if content_length and content_length > MAX_RESPONSE_SIZE:
+                    raise UpdateFailed(
+                        f"API response too large: {content_length} bytes"
+                    )
+
                 data = await resp.json()
-        except Exception as err:
+        except aiohttp.ClientError as err:
             raise UpdateFailed(f"Error communicating with API: {err}") from err
+        except TimeoutError as err:
+            raise UpdateFailed(f"Timeout fetching firmware data: {err}") from err
+
+        if not isinstance(data, dict):
+            raise UpdateFailed(f"Unexpected API response type: {type(data).__name__}")
 
         upgrade_url = data.get("UpgradeURL")
         if not upgrade_url:
             raise UpdateFailed("UpgradeURL not found in API response")
+
+        if not isinstance(upgrade_url, str):
+            raise UpdateFailed(f"UpgradeURL is not a string: {type(upgrade_url).__name__}")
 
         result = re.search(
             r"https://ereaderfiles\.kobo\.com/firmwares/(.*?)/(.*?)/kobo-update-(.*?)\.zip",
